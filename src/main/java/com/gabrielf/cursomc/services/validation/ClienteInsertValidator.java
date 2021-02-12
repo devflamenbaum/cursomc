@@ -6,12 +6,21 @@ import java.util.List;
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
 
+import org.springframework.beans.factory.annotation.Autowired;
+
+import com.gabrielf.cursomc.domain.Cliente;
 import com.gabrielf.cursomc.domain.enums.TipoCliente;
 import com.gabrielf.cursomc.dto.ClienteNewDTO;
+import com.gabrielf.cursomc.repository.ClienteRepository;
 import com.gabrielf.cursomc.resources.exceptions.FieldMessage;
 import com.gabrielf.cursomc.services.validation.utils.BR;
 
 public class ClienteInsertValidator implements ConstraintValidator<ClientInsert, ClienteNewDTO> {
+	
+	
+	@Autowired
+	private ClienteRepository repo;
+	
 	
 	@Override
 	public void initialize(ClientInsert ann) {
@@ -35,6 +44,11 @@ public class ClienteInsertValidator implements ConstraintValidator<ClientInsert,
 		for(FieldMessage e : list) {
 			context.disableDefaultConstraintViolation();
 			context.buildConstraintViolationWithTemplate(e.getMessage()).addPropertyNode(e.getFieldName()).addConstraintViolation();
+		}
+		
+		Cliente aux = repo.findByEmail(objDto.getEmail());
+		if(aux != null) {
+			list.add(new FieldMessage("email", "email já existe"));
 		}
 		
 		return list.isEmpty();

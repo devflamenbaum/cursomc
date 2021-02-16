@@ -14,11 +14,14 @@ import org.springframework.stereotype.Service;
 import com.gabrielf.cursomc.domain.Cidade;
 import com.gabrielf.cursomc.domain.Cliente;
 import com.gabrielf.cursomc.domain.Endereco;
+import com.gabrielf.cursomc.domain.enums.Perfil;
 import com.gabrielf.cursomc.domain.enums.TipoCliente;
 import com.gabrielf.cursomc.dto.ClienteDTO;
 import com.gabrielf.cursomc.dto.ClienteNewDTO;
 import com.gabrielf.cursomc.repository.ClienteRepository;
 import com.gabrielf.cursomc.repository.EnderecoRepository;
+import com.gabrielf.cursomc.security.UserSS;
+import com.gabrielf.cursomc.services.exceptions.AuthorizationException;
 import com.gabrielf.cursomc.services.exceptions.DataIntegrityException;
 import com.gabrielf.cursomc.services.exceptions.ObjectNotFoundException;
 
@@ -35,6 +38,12 @@ public class ClienteService {
 	private BCryptPasswordEncoder pe;
 	
 	public Cliente find(Integer id) {
+		
+		UserSS user = UserService.authenticated();
+		
+		if(user == null || !user.hasRole(Perfil.ADMIN) && !id.equals(user.getId())) {
+			throw new AuthorizationException("Você não tem permissão");
+		}
 		Optional<Cliente> obj = repo.findById(id);
 		return obj.orElseThrow(()-> new ObjectNotFoundException(
 				"Objeto não encontrado! Id: " + id + ", Tipo: " + Cliente.class.getName()));

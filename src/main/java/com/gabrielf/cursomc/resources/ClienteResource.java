@@ -82,9 +82,11 @@ public class ClienteResource {
 		return ResponseEntity.ok().body(listaDTO);
 	}
 	
-	@RequestMapping(value ="/picture",method = RequestMethod.POST)
-	public ResponseEntity<Void> uploadProfilePicture(@RequestParam(name="file") MultipartFile multipartFile){
-		URI uri = service.uploadProfilePicture(multipartFile);
+	@RequestMapping(value="/picture", method=RequestMethod.POST)
+	public ResponseEntity<Void> uploadProfilePicture(@RequestParam(name = "file") MultipartFile file) {
+		String test = "teste";
+		System.out.println(test);
+		URI uri = service.uploadProfilePicture(file);
 		return ResponseEntity.created(uri).build();
 	}
 }
